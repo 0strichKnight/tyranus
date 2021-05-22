@@ -40,6 +40,30 @@
       });
     }
   </script>
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-analytics.js"></script>
+
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyCe2MFi-yYYUnb_PAYj7HFiTsMIHAJbJGU",
+      authDomain: "tyranus-33ef3.firebaseapp.com",
+      projectId: "tyranus-33ef3",
+      storageBucket: "tyranus-33ef3.appspot.com",
+      messagingSenderId: "682719912724",
+      appId: "1:682719912724:web:0e5c462890e4ce38361801",
+      measurementId: "G-QH8C9HHR8N"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
+
   <script src="main.dart.js" type="application/javascript"></script>
 </body>
 </html>
