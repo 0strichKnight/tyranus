@@ -1,11 +1,9 @@
-import 'dart:developer';
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:tyranus/src/ApplicationLoginState.dart';
+import 'package:tyranus/src/Home.dart';
 
 void main() {
   runApp(
@@ -24,64 +22,13 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tyranus'),
-      ),
-      body: Center(
-        child: Consumer<ApplicationState>(
-          builder: (context, appState, _) => Authentication(
-              loginState: appState.loginState,
-              signIn: appState.signInAnonymous,
-              signOut: appState.signOut)
-        ),
+      home: Consumer<ApplicationState>(
+        builder: (context, appData, _) => Home(
+            loginState: appData.loginState,
+            signIn: appData.signInAnonymous,
+            signOut: appData.signOut),
       ),
     );
-  }
-}
-
-class Authentication extends StatelessWidget {
-  const Authentication({
-    required this.loginState,
-    required this.signIn,
-    required this.signOut,
-  });
-
-  final ApplicationLoginState loginState;
-  final void Function(void Function(Exception e) error) signIn;
-  final void Function() signOut;
-
-  @override
-  Widget build(BuildContext context) {
-    switch (loginState) {
-      case ApplicationLoginState.loggedOut:
-        return Center(
-          child: ElevatedButton(
-            onPressed: () {
-              signIn((e) => log("error"));
-              },
-            child: Text("Log in"),
-          ),
-        );
-      case ApplicationLoginState.loggedIn:
-        return Center(
-          child: Text("Logged in"),
-        );
-      default:
-        return Center(
-          child: Text("I feel a disturbance in the force..."),
-        );
-    }
   }
 }
 
@@ -117,9 +64,4 @@ class ApplicationState extends ChangeNotifier {
   void signOut() {
     FirebaseAuth.instance.signOut();
   }
-}
-
-enum ApplicationLoginState {
-  loggedOut,
-  loggedIn,
 }
