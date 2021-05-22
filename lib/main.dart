@@ -1,11 +1,22 @@
+import 'dart:developer';
+import 'dart:html';
+
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ApplicationState(),
+      builder: (context, _) => App(),
+    )
+  );
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,38 +24,102 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Tyranus'),
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class HomePage extends StatelessWidget {
+  HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Tyranus'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Start counting',
-            ),
-          ],
+        child: Consumer<ApplicationState>(
+          builder: (context, appState, _) => Authentication(
+              loginState: appState.loginState,
+              signIn: appState.signInAnonymous,
+              signOut: appState.signOut)
         ),
       ),
     );
   }
+}
+
+class Authentication extends StatelessWidget {
+  const Authentication({
+    required this.loginState,
+    required this.signIn,
+    required this.signOut,
+  });
+
+  final ApplicationLoginState loginState;
+  final void Function(void Function(Exception e) error) signIn;
+  final void Function() signOut;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (loginState) {
+      case ApplicationLoginState.loggedOut:
+        return Center(
+          child: ElevatedButton(
+            onPressed: () {
+              signIn((e) => log("error"));
+              },
+            child: Text("Log in"),
+          ),
+        );
+      case ApplicationLoginState.loggedIn:
+        return Center(
+          child: Text("Logged in"),
+        );
+      default:
+        return Center(
+          child: Text("I feel a disturbance in the force..."),
+        );
+    }
+  }
+}
+
+class ApplicationState extends ChangeNotifier {
+  ApplicationLoginState _loginState = ApplicationLoginState.loggedOut;
+  ApplicationLoginState get loginState => _loginState;
+
+  ApplicationState() {
+    init();
+  }
+
+  Future<void> init() async {
+    await Firebase.initializeApp();
+
+    FirebaseAuth.instance.userChanges().listen((user) {
+      if (user == null) {
+        _loginState = ApplicationLoginState.loggedOut;
+      } else {
+        _loginState = ApplicationLoginState.loggedIn;
+      }
+      notifyListeners();
+    });
+  }
+
+  void signInAnonymous(void Function(FirebaseAuthException e) errorCallback) async {
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+    } on FirebaseAuthException catch (e) {
+      errorCallback(e);
+    }
+  }
+
+  void signOut() {
+    FirebaseAuth.instance.signOut();
+  }
+}
+
+enum ApplicationLoginState {
+  loggedOut,
+  loggedIn,
 }
