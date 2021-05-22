@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "682719912724",
+    "project_id": "tyranus-33ef3",
+    "storage_bucket": "tyranus-33ef3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682719912724:android:bacc3147465f4201361801",
+        "android_client_info": {
+          "package_name": "com.ostrich.tyranus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "682719912724-5aop8p1r3frp33j3nbudsgat7betoa7l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc3B4bnxVNiSSZO-8asaYEtUDK0yisUvQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "682719912724-5aop8p1r3frp33j3nbudsgat7betoa7l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
