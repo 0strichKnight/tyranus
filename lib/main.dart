@@ -29,7 +29,7 @@ class App extends StatelessWidget {
       home: Consumer<ApplicationState>(
         builder: (context, appData, _) => Home(
           loginState: appData.loginState,
-          signIn: appData.signInAnonymous,
+          signIn: appData.signInGoogle,
           signOut: appData.signOut,
           addThing: appData.addThing,
           things: appData.things,
@@ -82,10 +82,9 @@ class ApplicationState extends ChangeNotifier {
     });
   }
 
-  void signInAnonymous(
-      void Function(FirebaseAuthException e) errorCallback) async {
+  void signInGoogle(void Function(FirebaseAuthException e) errorCallback) async {
     try {
-      await FirebaseAuth.instance.signInAnonymously();
+      await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
