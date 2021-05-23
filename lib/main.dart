@@ -6,16 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:tyranus/src/ApplicationLoginState.dart';
 import 'package:tyranus/src/Home.dart';
 
+import 'src/Models.dart';
+
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ApplicationState(),
-      builder: (context, _) => App(),
-    )
-  );
+  runApp(ChangeNotifierProvider(
+    create: (context) => ApplicationState(),
+    builder: (context, _) => App(),
+  ));
 }
 
 class App extends StatelessWidget {
@@ -29,10 +28,10 @@ class App extends StatelessWidget {
       ),
       home: Consumer<ApplicationState>(
         builder: (context, appData, _) => Home(
-            loginState: appData.loginState,
-            signIn: appData.signInAnonymous,
-            signOut: appData.signOut,
-            addThing: appData.addThing,
+          loginState: appData.loginState,
+          signIn: appData.signInAnonymous,
+          signOut: appData.signOut,
+          addThing: appData.addThing,
           things: appData.things,
         ),
       ),
@@ -42,10 +41,12 @@ class App extends StatelessWidget {
 
 class ApplicationState extends ChangeNotifier {
   ApplicationLoginState _loginState = ApplicationLoginState.loggedOut;
+
   ApplicationLoginState get loginState => _loginState;
 
   StreamSubscription<QuerySnapshot>? _thingsSubscription;
   List<Thing> _things = [];
+
   List<Thing> get things => _things;
 
   ApplicationState() {
@@ -63,27 +64,26 @@ class ApplicationState extends ChangeNotifier {
       } else {
         _loginState = ApplicationLoginState.loggedIn;
         _thingsSubscription = FirebaseFirestore.instance
-          .collection('things')
-          .orderBy('timestamp')
-          .snapshots()
-          .listen((snapshot) {
-            _things = [];
-            snapshot.docs.forEach((doc) {
-              _things.add(
-                Thing(
-                  name: doc.data()['name'],
-                  count: doc.data()['count'],
-                )
-              );
-            });
-            notifyListeners();
+            .collection('things')
+            .orderBy('timestamp')
+            .snapshots()
+            .listen((snapshot) {
+          _things = [];
+          snapshot.docs.forEach((doc) {
+            _things.add(Thing(
+              name: doc.data()['name'],
+              count: doc.data()['count'],
+            ));
+          });
+          notifyListeners();
         });
       }
       notifyListeners();
     });
   }
 
-  void signInAnonymous(void Function(FirebaseAuthException e) errorCallback) async {
+  void signInAnonymous(
+      void Function(FirebaseAuthException e) errorCallback) async {
     try {
       await FirebaseAuth.instance.signInAnonymously();
     } on FirebaseAuthException catch (e) {

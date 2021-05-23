@@ -1,4 +1,0 @@
-enum ApplicationLoginState {
-  loggedOut,
-  loggedIn,
-}
