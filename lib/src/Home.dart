@@ -1,7 +1,7 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import 'ApplicationLoginState.dart';
+import 'Login.dart';
 
 class Home extends StatelessWidget {
   const Home({
@@ -18,17 +18,8 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (loginState) {
       case ApplicationLoginState.loggedOut:
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Dooku'),
-            actions: <Widget>[
-              ElevatedButton(
-                  onPressed: () {
-                    signIn((e) => log("error"));
-                  },
-                  child: Text("Log in")),
-            ],
-          ),
+        return Login(
+          signIn: this.signIn,
         );
       case ApplicationLoginState.loggedIn:
         return Scaffold(
