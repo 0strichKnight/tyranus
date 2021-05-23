@@ -17,7 +17,7 @@ class Login extends StatelessWidget {
       ),
       body: Center(
           child: Padding(
-            padding: EdgeInsetsDirectional.all(20.0),
+            padding: EdgeInsets.all(20.0),
             child: Column(
             children: <Widget>[
               Image(image: AssetImage('dooku.jpg')),
