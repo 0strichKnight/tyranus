@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -34,18 +32,30 @@ class Home extends StatelessWidget {
           appBar: AppBar(title: Text('Tyranus'), actions: <Widget>[
             IconButton(onPressed: () => signOut(), icon: Icon(Icons.logout)),
           ]),
-          body: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: ThingsToCount(
-                  addThing: (text) => this.addThing(text),
-                ),
-              ),
-              SizedBox(height: 8),
-              for (var thing in things)
-                Text('${thing.name} -> ${thing.count}')
-            ],
+          body: ListView.builder(
+            shrinkWrap: true,
+            itemCount: things.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                  title: Text('${things[index].name}')
+              );
+            },
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (_) => Dialog(
+                    child: Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: ThingsToCount(
+                        addThing: (text) => this.addThing(text),
+                      ),
+                    )
+                  )
+              );
+            },
+            child: Icon(Icons.add),
           ),
         );
       default:
@@ -68,63 +78,44 @@ class ThingsToCount extends StatefulWidget {
 class _ThingsToCountState extends State<ThingsToCount> {
   final _formKey = GlobalKey<FormState>(debugLabel: '_thingsToCountState');
   final _controller = TextEditingController();
-  bool isAdding = false;
 
   @override
   Widget build(BuildContext context) {
-    if (isAdding) {
-      return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Form(
-                key: _formKey,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          hintText: 'Add something to count',
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Forgot something?';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    ElevatedButton(
-                        onPressed: () async {
-                          await widget.addThing(_controller.text);
-                          _controller.clear();
-                          setState(() {
-                            isAdding = false;
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Icon(Icons.add),
-                            SizedBox(width: 4),
-                            Text('ADD')
-                          ],
-                        )),
-                  ],
-                ),
-              ),
-            ),
-          ]
-      );
-    } else {
-      return Row(
+    return Form(
+      key: _formKey,
+      child: Row(
         children: [
-          TextButton(onPressed: () => setState(() => isAdding = true), child: Text("Add")),
+          Expanded(
+            child: TextFormField(
+              controller: _controller,
+              decoration: InputDecoration(
+                hintText: 'Add something to count',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Forgot something?';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+              icon: Icon(Icons.cancel_rounded),
+              onPressed: () {
+                Navigator.pop(context);
+              }
+          ),
+          IconButton(
+              icon: Icon(Icons.check_circle),
+              onPressed: () async {
+                await widget.addThing(_controller.text);
+                Navigator.pop(context);
+              }
+          ),
         ],
-      );
-    }
+      ),
+    );
   }
 }
 
