@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,7 +31,10 @@ class App extends StatelessWidget {
         builder: (context, appData, _) => Home(
             loginState: appData.loginState,
             signIn: appData.signInAnonymous,
-            signOut: appData.signOut),
+            signOut: appData.signOut,
+            addThing: appData.addThing,
+          things: appData.things,
+        ),
       ),
     );
   }
@@ -36,6 +43,10 @@ class App extends StatelessWidget {
 class ApplicationState extends ChangeNotifier {
   ApplicationLoginState _loginState = ApplicationLoginState.loggedOut;
   ApplicationLoginState get loginState => _loginState;
+
+  StreamSubscription<QuerySnapshot>? _thingsSubscription;
+  List<Thing> _things = [];
+  List<Thing> get things => _things;
 
   ApplicationState() {
     init();
@@ -47,8 +58,26 @@ class ApplicationState extends ChangeNotifier {
     FirebaseAuth.instance.userChanges().listen((user) {
       if (user == null) {
         _loginState = ApplicationLoginState.loggedOut;
+        _things = [];
+        _thingsSubscription?.cancel();
       } else {
         _loginState = ApplicationLoginState.loggedIn;
+        _thingsSubscription = FirebaseFirestore.instance
+          .collection('things')
+          .orderBy('timestamp')
+          .snapshots()
+          .listen((snapshot) {
+            _things = [];
+            snapshot.docs.forEach((doc) {
+              _things.add(
+                Thing(
+                  name: doc.data()['name'],
+                  count: doc.data()['count'],
+                )
+              );
+            });
+            notifyListeners();
+        });
       }
       notifyListeners();
     });
@@ -64,5 +93,18 @@ class ApplicationState extends ChangeNotifier {
 
   void signOut() {
     FirebaseAuth.instance.signOut();
+  }
+
+  Future<DocumentReference> addThing(String thing) {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception('Nooooooo!');
+    }
+
+    return FirebaseFirestore.instance.collection('things').add({
+      'name': thing,
+      'count': 0,
+      'timestamp': DateTime.now().microsecondsSinceEpoch,
+      'user': FirebaseAuth.instance.currentUser!.uid,
+    });
   }
 }
