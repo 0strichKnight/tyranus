@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +38,24 @@ class Home extends StatelessWidget {
             shrinkWrap: true,
             itemCount: things.length,
             itemBuilder: (context, index) {
-              return ListTile(title: Text('${things[index].name}'));
+              return Card(
+                child: ListTile(
+                  title: Text('${things[index].name}'),
+                  trailing: Wrap(
+                    spacing: 10,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0, 5.0, 0, 0),
+                        child: Text('${things[index].count}'),
+                      ),
+                      TextButton(
+                          onPressed: () => log("pressed ${index}"),
+                          child: Icon(Icons.arrow_circle_up_rounded)
+                      ),
+                    ],
+                  ),
+                ),
+              );
             },
           ),
           floatingActionButton: FloatingActionButton(
