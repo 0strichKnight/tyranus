@@ -14,12 +14,14 @@ class Home extends StatelessWidget {
     required this.signOut,
     required this.addThing,
     required this.things,
+    required this.increment,
   });
 
   final ApplicationLoginState loginState;
   final void Function(void Function(Exception e) error) signIn;
   final void Function() signOut;
   final void Function(String thing) addThing;
+  final void Function(Thing thing) increment;
   final List<Thing> things;
 
   @override
@@ -49,8 +51,11 @@ class Home extends StatelessWidget {
                         child: Text('${things[index].count}'),
                       ),
                       TextButton(
-                          onPressed: () => log("pressed ${index}"),
-                          child: Icon(Icons.arrow_circle_up_rounded)
+                          onPressed: () {
+                              increment(things[index]);
+                              things[index].count++;
+                            },
+                            child: Icon(Icons.arrow_circle_up_rounded),
                       ),
                     ],
                   ),

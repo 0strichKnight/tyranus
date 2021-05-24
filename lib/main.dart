@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,6 +35,7 @@ class App extends StatelessWidget {
           signOut: appData.signOut,
           addThing: appData.addThing,
           things: appData.things,
+          increment: appData.incrementThing,
         ),
       ),
     );
@@ -65,12 +68,14 @@ class ApplicationState extends ChangeNotifier {
         _loginState = ApplicationLoginState.loggedIn;
         _thingsSubscription = FirebaseFirestore.instance
             .collection('things')
+            .where("user", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .orderBy('timestamp')
             .snapshots()
             .listen((snapshot) {
           _things = [];
           snapshot.docs.forEach((doc) {
             _things.add(Thing(
+              id: doc.id,
               name: doc.data()['name'],
               count: doc.data()['count'],
             ));
@@ -104,6 +109,16 @@ class ApplicationState extends ChangeNotifier {
       'count': 0,
       'timestamp': DateTime.now().microsecondsSinceEpoch,
       'user': FirebaseAuth.instance.currentUser!.uid,
+    });
+  }
+
+  Future<void> incrementThing(Thing thing) {
+    if (_loginState != ApplicationLoginState.loggedIn) {
+      throw Exception("Nooooo!");
+    }
+
+    return FirebaseFirestore.instance.collection('things').doc(thing.id).update({
+      "count": thing.count + 1
     });
   }
 }

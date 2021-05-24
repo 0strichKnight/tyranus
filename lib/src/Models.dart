@@ -4,8 +4,9 @@ enum ApplicationLoginState {
 }
 
 class Thing {
-  Thing({required this.name, required this.count});
+  Thing({required this.id, required this.name, required this.count});
 
+  final String id;
   final String name;
-  final int count;
+  int count;
 }
